@@ -1,3 +1,4 @@
+from logging import debug
 from app import zonaCipta_app
 
 app = zonaCipta_app()

@@ -4,13 +4,15 @@ from flask import request, make_response, jsonify
 import json
 
 from app.baseModel import FailedResponse, SuccessResponse, config
-from app.zone.models import DumpZoneData, ItemData, ZoneData
-from app.zone.services import dumpAllHotel, registerNewItem, registerNewZone
+from app.zone.models import DumpZoneData, ItemData, QueryType, ZoneData
+from app.zone.services import dumpAllHotel, registerNewItem, registerNewZone, searchByQuery
 
 """
 ROUTING
 
-base uri: /api/hotels
+base uri: /api/zones
+
+GET /search - Get a result based on a given query
 
 GET / - Get ALL Hotels (Required DEV-TOKEN)
 POST / - Register a new Hotel instance
@@ -30,6 +32,7 @@ class Zones(Resource):
 
         Return
         {
+            "status": "OK",
             data: [
                 {
                     "hotel_name" - hotel's name
@@ -69,6 +72,7 @@ class Zones(Resource):
         }    
         Return
         {
+            "status": "OK",
             data: [
                 {
                     "hotel_name" - hotel's name
@@ -93,15 +97,112 @@ class Zones(Resource):
 
             registerNewZone(data, img)
             return make_response(SuccessResponse(
-                data=[req]
+                data=[data.toJson()]
             ).toJson(), 300)
         except Exception as e:
+            print(e)
             return make_response(FailedResponse(
                 errorMessage=str(e)
             ).toJson(), 400)
 
+@hotel_np.route("/search")
+class SearchZone(Resource):
+    def get(self):
+        """
+        Request:
+        params:
+            query: query for searching
+            per_page: content per page
+            page: page nth
+        
+        Return
+        {
+            data: [
+                    {
+                        "id" - room's package id
+                        "zones_id" - Personals' id 
+                        "name" - room's name
+                        "desc" - room's descriptions
+                        "price" - room's price in IDR
+                        "capacity" - room's capacity
+                        "img" - room's images (url)
+                        "tags" - tags (list)
+                    }
+                                    .
+                                    .
+                                    .
+            ]
+            page - current page
+            perPage - element per page
+        }
+        """
+        try:
+            query = request.args.get("query", type=QueryType)
+            itemPerPage = request.args.get("per_page", 25, type=int)
+            page = request.args.get("page", 1, type=int)
+
+            searchResult = DumpZoneData()
+            searchByQuery(query, searchResult, itemPerPage, page)
+
+            return make_response(SuccessResponse(
+                data=list(itm.toJson() for itm in searchResult.zones),
+                page=page,
+                perPage=itemPerPage
+            ).toJson(), 300)
+            
+        except Exception as e:
+            print(e)
+            return make_response(FailedResponse(
+                errorMessage=str(e)
+            ).toJson(), 400)
+        
 @hotel_np.route("/<int:uid>")
 class Zone(Resource):
+    def get(self):
+        """
+        Request:
+        {
+            "perPage" - per page (default=25)
+            "page" - page (defauit=1)
+            "keywords" - keyword to find
+        }
+
+        Return
+        {
+            "status": "OK",
+            data: [
+                {
+                    "id" - room's package id
+                    "zones_id" - Personals' id 
+                    "name" - room's name
+                    "desc" - room's descriptions
+                    "price" - room's price in IDR
+                    "capacity" - room's capacity
+                    "img" - room's images (url)
+                    "tags" - tags (list)
+                }
+                                .
+                                .
+                                .
+            ]
+        }
+        """
+        try:
+            hed = request.headers.get("ZC-DEV-KEY")
+            if (not hed) or (hed != config.get("DEV_KEY")):
+                raise Exception("WEAKLING!!!")
+            dumps = DumpZoneData()
+            dumpAllHotel(dumps)
+
+            return make_response(SuccessResponse(
+                data=dumps.toJson()
+            ).toJson(), 300)
+        except Exception as e:
+            print(e)
+            return make_response(FailedResponse(
+                errorMessage=str(e)
+            ).toJson(), 400)
+
     def post(self, uid):
         """
         Request:
@@ -116,6 +217,7 @@ class Zone(Resource):
         }    
         Return
         {
+            "status": "OK",
             data: [
                 {
                     "id" - room's package id
@@ -148,7 +250,7 @@ class Zone(Resource):
 
             registerNewItem(data, img)
             return make_response(SuccessResponse(
-                data=[req]
+                data=[data.toJson()]
             ).toJson(), 300)
         except Exception as e:
             print(e)

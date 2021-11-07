@@ -27,6 +27,7 @@ def test_add_zone():
     assert res_json.get("data") != None
 
     jsonData = res_json.get("data")[0]
+    print(res_json.get("data"))
     assert jsonData.get("id") != 0
     assert jsonData.get("hotel_name") == "Lunar Hotel"
     assert jsonData.get("hotel_name") != "LunarHotel"
@@ -63,7 +64,7 @@ def test_add_zone_room():
     assert jsonData.get("zones_id") != 0
     assert jsonData.get("name") != "Lunar Hotel"
     assert jsonData.get("desc") == "Beautiful"
-    assert "Kyaan" in jsonData.get("tags")
+    assert "Kyaan" in jsonData.get("tagged")
 
 @pytest.mark.order(1)
 @pytest.mark.dependency(depends=['test_add_zone'])

@@ -35,6 +35,7 @@ class Users(Resource):
 
         Return
         {
+            "status": "OK",
             data: [
                 {
                     "id" - id
@@ -86,6 +87,7 @@ class User(Resource):
 
         Return
         {
+            "status": "OK",
             data: [
                 "id" - id
                 "username" - username

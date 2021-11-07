@@ -25,6 +25,7 @@ class SuccessResponse:
             return None
  
         res = {
+            "status": "OK",
             "data": cls.data,
             "count": len(cls.data),
             "date_created": datetime.utcnow()
@@ -42,7 +43,9 @@ class FailedResponse:
     created: datetime = None
 
     def toJson(cls):
-        res = {}
+        res = {
+            "status": "ERROR",
+        }
         if cls.errorCode:
             res["error_code"] = cls.errorCode
         elif cls.errorMessage:

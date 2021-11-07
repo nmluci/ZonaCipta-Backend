@@ -3,7 +3,7 @@ from flask_restx import Namespace, Resource
 from flask import request, make_response, jsonify
 import json
 
-from app.baseModel import FailedResponse, SuccessResponse
+from app.baseModel import FailedResponse, SuccessResponse, config
 from app.zone.models import DumpZoneData, ItemData, ZoneData
 from app.zone.services import dumpAllHotel, registerNewItem, registerNewZone
 
@@ -45,7 +45,7 @@ class Zones(Resource):
         """
         try:
             hed = request.headers.get("ZC-DEV-KEY")
-            if not hed:
+            if (not hed) or (hed != config.get("DEV_KEY")):
                 raise Exception("WEAKLING!!!")
             dumps = DumpZoneData()
             dumpAllHotel(dumps)
@@ -56,7 +56,7 @@ class Zones(Resource):
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
-                errorMessage=e
+                errorMessage=str(e)
             ).toJson(), 400)
     
     def post(self):
@@ -80,7 +80,6 @@ class Zones(Resource):
         }
         """
         try:
-            print(request.form.get("data"))
             req = json.loads(request.form.get("data"))
             if not req:
                 raise Exception("Invalid JSON Body")

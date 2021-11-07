@@ -7,11 +7,10 @@ class Orders(db.Model):
     __tablename__ = "Orders"
 
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.Text, db.ForeignKey("Users.username", ondelete="SET NULL", onupdate="CASCADE"))
     done = db.Column(db.Boolean, default=False)
     total_cost = db.Column(db.Integer, nullable=False, default=0)
     date_created = db.Column(db.DateTime, nullable=False)
-    customer_name = db.Column(db.Text, nullable=False)
-    phone = db.Column(db.Text, nullable=False)
 
     def insert(self):
         db.session.add(self)
@@ -30,7 +29,7 @@ class OrderItems(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("Orders.id", ondelete="SET NULL", onupdate="CASCADE"))
-    product = db.Column(db.Integer, db.ForeignKey("HotelItems.id", ondelete="SET NULL", onupdate="CASCADE"))
+    product = db.Column(db.Integer, db.ForeignKey("ZoneItems.id", ondelete="SET NULL", onupdate="CASCADE"))
     reserved_time = db.Column(db.DateTime, nullable=False)
     done = db.Column(db.Boolean, default=False)
     sum = db.Column(db.Integer, nullable=False)

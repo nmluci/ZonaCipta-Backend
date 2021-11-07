@@ -37,6 +37,23 @@ def registerNewItem(metadata: ItemData, img):
    metadata.id = zoneItem.id
    metadata.img = imgUrl
 
+def searchByQuery(query: str, result: DumpZoneData, perPage: int = 25, page: int = 1, ):
+   res = db.session.query(ZoneItems).filter(
+            ZoneItems.name.ilike(f"%{query}%") | ZoneItems.desc.ilike(f"%{query}%")
+         ).limit(perPage).offset(page-1).all()
+   
+   result.zones = list(ItemData(
+      zoneId=itm.zones_id,
+      id=itm.id,
+      name=itm.name,
+      price=itm.price,
+      desc=itm.desc,
+      capacity=itm.capacity,
+      tagged=itm.tags,
+      img=itm.img
+   ) for itm in res)
+
+
 def dumpAllHotel(dumps: DumpZoneData):
    data = db.session.query(Zones).all()
 
@@ -49,7 +66,6 @@ def dumpAllHotel(dumps: DumpZoneData):
    ) for x in data)
 
    dumps.zones = dump
-   
 
 def dumpZoneData(dumps: ZoneData):
    zone = db.session.query(Zones).filter(Zones.id==dumps.id).first()

@@ -90,14 +90,14 @@ class ZoneData:
 
     def toJson(cls):
         res = {
-            "name": cls.name,
+            "hotel_name": cls.name,
             "address": cls.address,
             "phone": cls.phone
         }
 
         if cls.id: res["id"] = cls.id
         if cls.items: res["items"] = list(x.toJson() for x in cls.items)
-        return cls
+        return res
 
 @dataclass
 class DumpZoneData:
@@ -110,3 +110,7 @@ class DumpZoneData:
             "zones": list(zone.toJson() for zone in cls.zones),
             "count": len(cls.zones)
         }
+
+class QueryType(str):
+    def __str__(self) -> str:
+        return self.lower()

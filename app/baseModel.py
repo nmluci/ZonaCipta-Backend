@@ -22,7 +22,10 @@ class SuccessResponse:
     
     def toJson(cls):
         if not cls.data: 
-            return None
+            return {
+                "status": "OK",
+                "date_created": datetime.utcnow()
+            }
  
         res = {
             "status": "OK",
@@ -33,7 +36,7 @@ class SuccessResponse:
         if cls.page:
             res["per_page"] = cls.perPage
             res["page"] = cls.page
-            res["totalPages"] = cls.totalPages if cls.totalPages else (cls.count // cls.perPage)
+            # res["totalPages"] = cls.totalPages if cls.totalPages else (cls.count // cls.perPage)
         return res
 
 @dataclass

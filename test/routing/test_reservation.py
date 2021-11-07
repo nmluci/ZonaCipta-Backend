@@ -1,7 +1,8 @@
-import requests
-import json
+import requests, json, pytest
 
-def test():
+@pytest.mark.order(3)
+@pytest.mark.dependency(depends=['test_register_new_user'])
+def test_reserve_room():
     file = {
         "img": open("./test/018-2.jpg", "rb")
     }
@@ -22,7 +23,7 @@ def test():
 
     res_json = res.json()
 
-    assert res.status_code != 400
+    assert res_json.get("status") == "ERROR"
     assert res_json.get("error_message") == None
     assert res_json.get("data") != None
 

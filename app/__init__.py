@@ -7,9 +7,11 @@ import json
 from app.baseModel import FailedResponse, config, db, migrate
 from app.zone.controllers import hotel_np
 from app.reservation.controllers import reservation_np
+from app.user.controllers import user_np
 
 from app.zone.models import Zones, ZoneItems
 from app.reservation.models import OrderItems, Orders
+from app.user.models import Users
 
 def zonaCipta_app(do_migrate=False):
     app = Flask(__name__)
@@ -35,12 +37,15 @@ def zonaCipta_app(do_migrate=False):
     
     api.add_namespace(hotel_np)
     api.add_namespace(reservation_np)
-    
+    api.add_namespace(user_np)
+
     api.init_app(app)
     db.init_app(app)
 
     if do_migrate:
+        print("Reinitialize Database")
         migrate.init_app(app, db)
         db.drop_all(app=app)
         db.create_all(app=app)
+        print("Reinitialize Database DONE")
     return app

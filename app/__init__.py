@@ -30,7 +30,7 @@ def zonaCipta_app(do_migrate=False):
     @app.before_request
     def headerCheck():
         apiKey = request.headers.get("ZC-API-TOKEN", None)
-        if (not apiKey) or apiKey != os.environ.get("DB_AUTH"):
+        if (not apiKey) or apiKey != os.environ.get("API_KEY"):
             return make_response(FailedResponse(
                 errorMessage="THOU SHALT NOT PASS."
             ).toJson(), 401)

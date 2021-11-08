@@ -9,7 +9,7 @@ import dotenv
 
 db = SQLAlchemy()
 migrate = Migrate()
-config = dotenv.dotenv_values()
+config = dotenv.load_dotenv()
 
 @dataclass
 class SuccessResponse:

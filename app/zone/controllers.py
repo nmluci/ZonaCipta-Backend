@@ -1,7 +1,6 @@
-from os import name
 from flask_restx import Namespace, Resource
 from flask import request, make_response, jsonify
-import json
+import json, os
 
 from app.baseModel import FailedResponse, SuccessResponse, config
 from app.zone.models import DumpZoneData, ItemData, QueryType, ZoneData
@@ -48,7 +47,7 @@ class Zones(Resource):
         """
         try:
             hed = request.headers.get("ZC-DEV-KEY")
-            if (not hed) or (hed != config.get("DEV_KEY")):
+            if (not hed) or (hed != os.environ.get("DEV_KEY")):
                 raise Exception("WEAKLING!!!")
             dumps = DumpZoneData()
             dumpAllHotel(dumps)

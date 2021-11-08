@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask.helpers import make_response
 from flask_cors import CORS
 from flask_restx import Api, resource
-import json
+import os
 
 from app.baseModel import FailedResponse, config, db, migrate
 from app.zone.controllers import hotel_np
@@ -17,7 +17,7 @@ def zonaCipta_app(do_migrate=False):
     app = Flask(__name__)
     app.config["JSON_SORT_KEYS"] = False
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = config.get("DB_AUTH")
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_AUTH")
     CORS(app)
 
     api = Api(
@@ -30,7 +30,7 @@ def zonaCipta_app(do_migrate=False):
     @app.before_request
     def headerCheck():
         apiKey = request.headers.get("ZC-API-TOKEN", None)
-        if (not apiKey) or apiKey != config.get("API_KEY"):
+        if (not apiKey) or apiKey != os.environ.get("DB_AUTH"):
             return make_response(FailedResponse(
                 errorMessage="THOU SHALT NOT PASS."
             ).toJson(), 401)

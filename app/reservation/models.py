@@ -88,6 +88,7 @@ class UserBooks:
     grandTotal: int = None
     done: bool = None
     items: List[BookedItem] = None
+    sign_key: str = None
 
     def toJson(cls):
         res = {
@@ -100,6 +101,8 @@ class UserBooks:
 
         if cls.items:
             res["items"] = list(item.toJson() for item in cls.items)
+        if cls.sign_key:
+            res["sign_key"] = cls.sign_key
         return res
 
 @dataclass

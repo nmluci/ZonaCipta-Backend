@@ -71,7 +71,8 @@ def getUserBooking(metadata: UserBooks):
 
     bookingItem = db.session.query(OrderItems).filter(
         (OrderItems.order_id==bookingData.id)).all()
-
+    for itm in bookingItem:
+        metadata.sum += itm.sum
     if not bookingItem:
         raise Exception("Couldn't find any item in the order")
     else:

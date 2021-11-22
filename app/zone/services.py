@@ -42,7 +42,7 @@ def registerNewItem(metadata: ItemData, img):
 
 def searchByQuery(query: str, result: DumpZoneData, perPage: int = 25, page: int = 1, ):
    res = db.session.query(ZoneItems).filter(
-            ZoneItems.name.ilike(f"%{query}%") | ZoneItems.desc.ilike(f"%{query}%") | ZoneItems.tags.contains([f"{query}"])
+            ZoneItems.name.ilike(f"%{query}%") | ZoneItems.desc.ilike(f"%{query}%") | ZoneItems.tags.contains([query])
          ).limit(perPage).offset(page-1).all()
    
    result.zones = list(ItemData(

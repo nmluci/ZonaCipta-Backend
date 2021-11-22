@@ -65,7 +65,7 @@ class Books(Resource):
             bookNewRoom(newBook)
             return make_response(SuccessResponse(
                 data=[newBook.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
@@ -91,8 +91,8 @@ class BookDetail(Resource):
                     "done" - paid boolean
                     "items": [
                         {
-                            "product_id" - room's item id
-                            "product_name" - packag's name
+                            "product_id" - item id
+                            "product_name" - package's name
                             "reserved_time" - reserved time
                             "price" - price
                             "sum" - sum
@@ -115,7 +115,7 @@ class BookDetail(Resource):
 
             return make_response(SuccessResponse(
                 data=[userBooking.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
@@ -159,7 +159,7 @@ class Book(Resource):
             if not verifyPayment(verifyData):
                 raise Exception("Invalid Sign Key")
             
-            return make_response(SuccessResponse().toJson(), 300)
+            return make_response(SuccessResponse().toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(

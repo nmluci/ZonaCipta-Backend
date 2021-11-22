@@ -2,7 +2,7 @@ from hashlib import new
 from logging import error
 from flask_restx import Namespace, Resource
 from flask import request, make_response
-import json
+import json, os
 
 from app.baseModel import FailedResponse, SuccessResponse, config
 from app.user.models import UserData
@@ -50,7 +50,7 @@ class Users(Resource):
         """
         try:
             hed = request.headers.get("ZC-DEV-KEY")
-            isProd = False if (not hed) or (hed != config.get("DEV_KEY")) else True
+            isProd = False if (not hed) or (hed != os.environ.get("DEV_KEY")) else True
 
             req = request.get_json()
             if not req:
@@ -67,7 +67,7 @@ class Users(Resource):
 
             return make_response(SuccessResponse(
                 data=[newUser.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
 
         except Exception as e:
             print(e)
@@ -112,7 +112,7 @@ class User(Resource):
             
             return make_response(SuccessResponse(
                 data=[user.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(

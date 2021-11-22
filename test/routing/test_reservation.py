@@ -271,3 +271,14 @@ def test_verify_payment_invalid_order_id():
     assert res_json.get("status") == "ERROR"
     assert res_json.get("error_message") == "Invalid Order Id"
     assert res_json.get("data") == None
+
+@pytest.mark.order(7)
+@pytest.mark.dependency(depends=["test_reserve_room"])
+def test_zone_get_orders():
+    res = requests.get("http://localhost:5000/api/zones/1/orders", headers={
+        "ZC-API-TOKEN": "KoreWaABeriSekyurEiPiAiKagiNanoDesu",
+    })
+
+    res_json = res.json()
+    assert res_json.get("status") == "OK"
+    assert len(res_json.get("data")) != 0

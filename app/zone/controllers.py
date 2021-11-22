@@ -3,8 +3,8 @@ from flask import request, make_response, jsonify
 import json, os
 
 from app.baseModel import FailedResponse, SuccessResponse, config
-from app.zone.models import DumpZoneData, ItemData, QueryType, ZoneData
-from app.zone.services import dumpAllHotel, registerNewItem, registerNewZone, searchByQuery
+from app.zone.models import DumpZoneData, ItemData, QueryType, ZoneData, ZoneOrders
+from app.zone.services import dumpZoneData, dumpAllHotel, getZoneOrders, registerNewItem, registerNewZone, searchByQuery
 
 """
 ROUTING
@@ -17,7 +17,9 @@ GET / - Get ALL Hotels (Required DEV-TOKEN)
 POST / - Register a new Hotel instance
 
 GET /<int:uid> - GET all item sold by specified hotel
-POST /<int:uid> - Submit new item for specified hotel 
+POST /<int:uid> - Submit new item for specified hotel
+
+GET /<int:uid>/orders - GET all order for specified hotel
 """
 
 hotel_np = Namespace("zones")
@@ -54,7 +56,7 @@ class Zones(Resource):
 
             return make_response(SuccessResponse(
                 data=dumps.toJson()
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
@@ -97,7 +99,7 @@ class Zones(Resource):
             registerNewZone(data, img)
             return make_response(SuccessResponse(
                 data=[data.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
@@ -142,12 +144,12 @@ class SearchZone(Resource):
 
             searchResult = DumpZoneData()
             searchByQuery(query, searchResult, itemPerPage, page)
-
+            print(len(searchResult.zones))
             return make_response(SuccessResponse(
                 data=list(itm.toJson() for itm in searchResult.zones),
                 page=page,
                 perPage=itemPerPage
-            ).toJson(), 300)
+            ).toJson(), 200)
             
         except Exception as e:
             print(e)
@@ -157,7 +159,7 @@ class SearchZone(Resource):
         
 @hotel_np.route("/<int:uid>")
 class Zone(Resource):
-    def get(self):
+    def get(self, uid):
         """
         Request:
         {
@@ -188,14 +190,14 @@ class Zone(Resource):
         """
         try:
             hed = request.headers.get("ZC-DEV-KEY")
-            if (not hed) or (hed != config.get("DEV_KEY")):
+            if (not hed) or (hed != os.environ.get("DEV_KEY")):
                 raise Exception("WEAKLING!!!")
-            dumps = DumpZoneData()
-            dumpAllHotel(dumps)
+            dumps = ZoneData(id=uid)
+            dumpZoneData(dumps)
 
             return make_response(SuccessResponse(
                 data=dumps.toJson()
-            ).toJson(), 300)
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(
@@ -206,7 +208,6 @@ class Zone(Resource):
         """
         Request:
         {
-            "zones_id" - Personals' id 
             "name" - room's name
             "desc" - room's descriptions
             "price" - room's price in IDR
@@ -250,7 +251,47 @@ class Zone(Resource):
             registerNewItem(data, img)
             return make_response(SuccessResponse(
                 data=[data.toJson()]
-            ).toJson(), 300)
+            ).toJson(), 200)
+        except Exception as e:
+            print(e)
+            return make_response(FailedResponse(
+                errorMessage=str(e)
+            ).toJson(), 400)
+
+@hotel_np.route("/<int:uid>/orders")
+class Zone(Resource):
+    def get(self, uid):
+        """
+        Request:
+        None
+
+        Return
+        {
+            "status": "OK",
+            "data": [
+                        {
+                            "zone_id" 
+                            "username" 
+                            "order_id" 
+                            "product_id" 
+                            "product_name" 
+                            "reserved_time"
+                            "sum" 
+                            "total_price"                 
+                        }
+                                .
+                                .
+                                .
+            ]
+        }
+        """
+        try:
+            dumps = ZoneOrders(zoneId=uid)
+            getZoneOrders(dumps)
+
+            return make_response(SuccessResponse(
+                data=dumps.toJson()
+            ).toJson(), 200)
         except Exception as e:
             print(e)
             return make_response(FailedResponse(

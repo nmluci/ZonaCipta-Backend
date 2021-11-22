@@ -47,6 +47,7 @@ def bookNewRoom(metadata: BookedItem):
 
     newOrderItem = OrderItems(
         order_id=metadata.orderId,
+        zone_id=productItem.zones_id,
         product=metadata.productId,
         reserved_time=metadata.reserveTime,
         sum=metadata.sum,

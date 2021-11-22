@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import datetime
 
 from typing import List
 from sqlalchemy.dialects import postgresql
@@ -76,14 +77,15 @@ class ItemData:
         
         if cls.img:
             res["img"] = cls.img
-
+        if cls.id:
+            res["room_id"] = cls.id
         return res
 
 @dataclass
 class ZoneData:
-    name: str
-    address: str
-    phone: int
+    name: str = None
+    address: str = None
+    phone: int = None
     id: int = None
     img: str = None
     items: list[ItemData] = None
@@ -109,6 +111,43 @@ class DumpZoneData:
         return {
             "zones": list(zone.toJson() for zone in cls.zones),
             "count": len(cls.zones)
+        }
+
+@dataclass
+class ZoneOrdersData:
+    zoneId: int = None
+    username: str = None
+    orderId: int = None
+    productId: int = None
+    productName: str = None
+    reservedTime: datetime = None
+    sum: int = None
+    totalPrice: int = None
+    
+    def toJson(cls):
+        return {
+            "zone_id": cls.zoneId,
+            "username": cls.username,
+            "order_id": cls.orderId,
+            "product_id": cls.productId,
+            "product_name": cls.productName,
+            "reserved_time": datetime.strftime(cls.reservedTime, "%Y-%m-%d %H:%M:%S"),
+            "sum": cls.sum,
+            "total_price": cls.totalPrice
+        }
+
+@dataclass
+class ZoneOrders:
+    zoneId: int
+    orders: List[ZoneOrdersData] = None
+
+    def toJson(cls):
+        if not cls.orders:
+            return None
+
+        return {
+            "zone_id": cls.zoneId,
+            "orders": list(itm.toJson() for itm in cls.orders)
         }
 
 class QueryType(str):

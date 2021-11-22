@@ -34,6 +34,7 @@ class OrderItems(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey("Orders.id", ondelete="SET NULL", onupdate="CASCADE"))
+    zone_id = db.Column(db.Integer, db.ForeignKey("Zones.id", ondelete="SET NULL", onupdate="CASCADE"))
     product = db.Column(db.Integer, db.ForeignKey("ZoneItems.id", ondelete="SET NULL", onupdate="CASCADE"))
     reserved_time = db.Column(db.DateTime, nullable=False)
     sum = db.Column(db.Integer, nullable=False)

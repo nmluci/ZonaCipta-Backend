@@ -1,5 +1,8 @@
+from json import dump
 from os import name
-from app.zone.models import DumpZoneData, ZoneData, ItemData, ZoneItems
+from app.reservation.models import OrderItems, Orders
+from app.user.models import Users
+from app.zone.models import DumpZoneData, ZoneData, ItemData, ZoneItems, ZoneOrders, ZoneOrdersData
 from app.zone.models import Zones, ZoneItems
 from app.baseModel import db
 
@@ -85,6 +88,29 @@ def dumpZoneData(dumps: ZoneData):
       tagged=x.tags,
       img=x.img
    ) for x in items)
+
+def getZoneOrders(dumps: ZoneOrders):
+   if not dumps.zoneId:
+      raise Exception("zone Id not included")
+
+   zoneData = db.session.query(Zones).filter(Zones.id==dumps.zoneId).first()
+   if not zoneData:
+      raise Exception("Zone ID isn't valid")
+
+   zoneOrders = db.session.query(OrderItems).filter(OrderItems.zone_id==dumps.zoneId).all()
+   if not zoneOrders:
+      raise Exception("zone has no orders")
+   
+   dumps.orders = list(
+      ZoneOrdersData(
+         zoneId=dumps.zoneId,
+         username=db.session.query(Orders).filter(Orders.id==itm.order_id).first().username,
+         orderId=itm.order_id,
+         productId=itm.product,
+         productName=db.session.query(ZoneItems).filter(ZoneItems.id==itm.product).first().name,
+         reservedTime=itm.reserved_time
+      ) for itm in zoneOrders
+   )
 
 def uploadImg(data: BinaryIO):
    res = curl.post("https://api.imgbb.com/1/upload", params={

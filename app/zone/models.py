@@ -78,7 +78,7 @@ class ItemData:
         if cls.img:
             res["img"] = cls.img
         if cls.id:
-            res["room_id"] = cls.id
+            res["item_id"] = cls.id
         return res
 
 @dataclass

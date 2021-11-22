@@ -117,7 +117,8 @@ class BookDetail(Resource):
                 data=[userBooking.toJson()]
             ).toJson(), 200)
         except Exception as e:
-            print(e)
+            import traceback
+            traceback.print_exc()
             return make_response(FailedResponse(
                 errorMessage=str(e)
             ).toJson(), 400)

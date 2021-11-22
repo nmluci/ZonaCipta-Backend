@@ -59,7 +59,6 @@ def getUserBooking(metadata: UserBooks):
     if not db.session.query(Users).filter(Users.username==metadata.username).first():
         raise Exception("Invalid Username")
     
-
     bookingData = db.session.query(Orders).filter(
         (Orders.username==metadata.username) & (Orders.done==False)).first()
     if not bookingData:
@@ -71,11 +70,13 @@ def getUserBooking(metadata: UserBooks):
 
     bookingItem = db.session.query(OrderItems).filter(
         (OrderItems.order_id==bookingData.id)).all()
-    for itm in bookingItem:
-        metadata.sum += itm.sum
+
     if not bookingItem:
         raise Exception("Couldn't find any item in the order")
     else:
+        for itm in bookingItem:
+            metadata.sum += itm.sum
+        metadata.sign_key = bookingData.sign_key
         metadata.items = list(BookedItem(
             productId=item.id,
             productName=db.session.query(ZoneItems).filter(ZoneItems.id==item.id).first().name,
@@ -96,8 +97,16 @@ def verifyPayment(metadata: PayData) -> bool:
     order = db.session.query(Orders).filter(Orders.id==metadata.orderid).first()
     if not order:
         raise Exception("Invalid Order Id")
+    
+    if order.done:
+        raise Exception("Order has been paid")
 
-    return order.sign_key == metadata.signKey
+    if order.sign_key == metadata.signKey:
+        order.done = True
+        order.update()
+        return True
+    else: 
+        return False
     
 def generateSignKey(order_id: int, total_cost: int, first_name:str, last_name: str, username: str):
     secureKey = hashlib.sha256()

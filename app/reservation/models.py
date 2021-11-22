@@ -84,7 +84,7 @@ class BookedItem:
 class UserBooks:
     username: str
     orderId: int = None
-    sum: int = None
+    sum: int = 0
     grandTotal: int = None
     done: bool = None
     items: List[BookedItem] = None
